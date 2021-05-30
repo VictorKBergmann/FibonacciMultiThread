@@ -1,27 +1,21 @@
 CC = g++
-CCFLAGS = -Wall
+CFLAGS = -Wall -g
+LDFLAGS = -lm
 
+all: library.o fatorial fibonacci quickSort
 
-exemple1: fatorial.o
-		$(CC) fatorial.cpp library.cpp -o fatorial fatorial.o -pthread
+library.o : library.h
+	${CC} ${CFLAGS} -c library.cpp -lpthread
 
-example1.o: fatorial.cpp
-		$(CC) fatorial.cpp library.cpp -c fatorial.cpp -pthread
+fatorial : library.o fatorial.o
+	${CC} ${CFLAGS} library.o fatorial.o ${LDFLAGS} -o fatorial -lpthread
+fibonacci : library.o fibonacci.o
+	${CC} ${CFLAGS} library.o fibonacci.o ${LDFLAGS} -o fibonacci -lpthread
+quickSort : library.o quickSort.o
+	${CC} ${CFLAGS} library.o quickSort.o ${LDFLAGS} -o quickSort -lpthread
 
-example2: fibonacci.o
-		$(CC) fibonacci.o library.cpp -o fibonacci fibonacci.o -pthread
-
-example2.o: fibonacci.cpp
-		$(CC) fibonacci.cpp library.cpp -c fibonacci.cpp -pthread
-
-example3: quickSort.o
-		$(CC) quickSort.o library.cpp -o quickSort quickSort.o -pthread
-
-example3.o: quickSort.cpp
-		$(CC) $(CCFLAGS) library.cpp -c quickSort.cpp -pthread
-
-clean:
-		- rm *.o
-		- rm quickSort
-		- rm fibonacci
-		- rm fatorial
+#clean:
+#	rm -rf *.o
+#	- rm quickSort
+#	- rm fibonacci
+#	- rm fatorial
