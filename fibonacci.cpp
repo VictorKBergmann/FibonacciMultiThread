@@ -43,7 +43,8 @@ void* fibo( void* dta ) {
 int main() {
     int n, *r, tId, m;
     //struct Atrib a;
-
+    cout << "Qtde thread: ";
+    cin >> m;
     start(m); // lança 4 PV como pthreads
 
     n = 10;

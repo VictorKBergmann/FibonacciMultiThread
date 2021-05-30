@@ -19,6 +19,7 @@ std::vector<struct Trabalho> ListaTrabalhosProntos, ListaTrabalhosTerminados; //
 
 static pthread_t *pvs; //Lista de PVs:
 pthread_mutex_t mutex; // Varivel de controle para o Mutex
+pthread_mutexattr_t attr;
 pthread_cond_t cond; // Condicional para o consumidor(PV) esperar
 
 
@@ -31,10 +32,14 @@ struct Trabalho* pegaUmTrabalho() {
     pthread_mutex_lock(&mutex); // Inicio secao critica
     if(ListaTrabalhosProntos.empty()) {
         pthread_cond_wait(&cond,&mutex);
+        cout << "dentro wait pegaUmTrabalho" << endl;
     }
     else if(!ListaTrabalhosProntos.empty()) {
+        cout << "dentro pegaUmTrabalho" << endl;
         t = &ListaTrabalhosProntos[ListaTrabalhosProntos.size()-1]; // Pega o primeiro da "fila" por padrão ARRUMAR
+        cout << "pegou umTrabalho" << endl;
         ListaTrabalhosProntos.erase(ListaTrabalhosProntos.end());
+        cout << "apagou o Trabalho" << endl;
     }
     pthread_mutex_unlock(&mutex); // Fim secao critica
     return t;
@@ -59,9 +64,9 @@ void* MeuPV(void* dta) {
         }
         else {
             cout << "entrou else" << endl;
-            t = pegaUmTrabalho(); //--->> Aqui o PV tem comportamento de consumidor
+            t = pegaUmTrabalho(); //--->> Aqui o PV tem comportamento de consumidor -- dando loop infinito
             cout << "antes fibo" << endl;
-            res = t->funcao( t->pEntrada );  // --->> vai para AAA
+            res = t->funcao( t->pEntrada );
             cout << "depois fibo" << endl;
             armazenaResultados(t, res); //--->> Coloca na Lista de Terminados
         }
@@ -76,13 +81,14 @@ int start(int m){
     pvs = (pthread_t*) malloc(m*sizeof(pthread_t));
     fim = false;
     cout << "antes for start"  << endl;
-    pthread_mutex_init(&mutex, NULL);
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&mutex, &attr);
     for( int i = 0 ; i < m; i++ )
         ret |= pthread_create(&(pvs[i]),NULL,MeuPV,NULL);
     cout << "alguma thread criada? " << ret << endl;
     cout << "depois for start" << endl;
     return ret;
-
 }
 
 int finish(int m) {
@@ -95,7 +101,7 @@ int finish(int m) {
 }
 
 int spawn(struct Atrib *atrib, void *(*t)(void *), void *dta) {
-     pthread_mutex_lock(&mutex); // Inicio secao critica
+    pthread_mutex_lock(&mutex); // Inicio secao critica
     struct Trabalho* umTrabalho = (struct Trabalho*) malloc(sizeof(struct Trabalho));
     umTrabalho->trabalhoID = idTrabalhoAtual;
     idTrabalhoAtual++;
@@ -106,11 +112,11 @@ int spawn(struct Atrib *atrib, void *(*t)(void *), void *dta) {
     cout << "depois push_back trabPronto" << endl;
     pthread_cond_signal(&cond);
     pthread_mutex_unlock(&mutex); // Fim secao critica
-
     return idTrabalhoAtual-1;
 }
 
 int sync(int tId, void* res){
+    cout << "entrou sync" << endl;
     int* resposta;
     int it1, it2;
     struct Trabalho* t = new Trabalho();
@@ -121,7 +127,7 @@ int sync(int tId, void* res){
         return -1;
     }
     for (it1 = 0; it1 < ListaTrabalhosProntos.size(); it1++) {
-    //for (std::list<struct T>::iterator; it1 != ListaTrabalhosProntos.end(); it1++) {
+        //for (std::list<struct T>::iterator; it1 != ListaTrabalhosProntos.end(); it1++) {
         if(ListaTrabalhosProntos[it1].trabalhoID == tId) {
             if(!ListaTrabalhosProntos.empty()) {
                 t = &ListaTrabalhosTerminados[it1]; // Pega o trabalho it, selecionado pelo tId ARRUMAR
@@ -145,5 +151,6 @@ int sync(int tId, void* res){
         }
     }
     pthread_mutex_unlock(&mutex); // Fim secao critica
+    cout << "liberou mutex sync" << endl;
     return *resposta;
 }
