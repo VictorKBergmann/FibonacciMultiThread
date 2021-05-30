@@ -48,7 +48,7 @@ struct Trabalho* pegaUmTrabalho() {
 void armazenaResultados(struct Trabalho *t, int * resultadoT){
     pthread_mutex_lock(&mutex); // Inicio secao critica
     t->resultado = resultadoT;
-    ListaTrabalhosTerminados.push_back(*t); // era t
+    ListaTrabalhosTerminados.push_back(*t);
     pthread_mutex_unlock(&mutex); // Fim secao critica
 }
 
@@ -60,9 +60,9 @@ void* MeuPV(void* dta) {
     if(ListaTrabalhosProntos.empty()) pthread_cond_wait(&cond, &mutex);
 
     while(fim==false && !ListaTrabalhosProntos.empty()) {
-        pthread_mutex_lock(&mutex); //precisa
-        t = pegaUmTrabalho(); //--->> Aqui o PV tem comportamento de consumidor -- dando loop infinito
-        res = (int*)t->funcao( t->pEntrada ); //-- deu seg fault quando da o bug
+        pthread_mutex_lock(&mutex);
+        t = pegaUmTrabalho(); //--->> Aqui o PV tem comportamento de consumidor
+        res = (int*)t->funcao( (void*)t->pEntrada );
         armazenaResultados(t, res); //--->> Coloca na Lista de Terminados
         pthread_mutex_unlock(&mutex);
     }
@@ -94,7 +94,7 @@ int finish() {
 
 int spawn(struct Atrib *atrib, void *(*t)(void *), void *dta) {
 
-    pthread_mutex_lock(&mutex); // Inicio secao critica -- loop infinito
+    pthread_mutex_lock(&mutex); // Inicio secao critica
     struct Trabalho* umTrabalho = new struct Trabalho();
     umTrabalho->trabalhoID = idTrabalhoAtual;
     idTrabalhoAtual++;
@@ -108,36 +108,38 @@ int spawn(struct Atrib *atrib, void *(*t)(void *), void *dta) {
 }
 
 int sync(int tId, void** res){
-
     int it1, it2;
     struct Trabalho* t = new struct Trabalho();
-    pthread_mutex_lock(&mutex); // Inicio secao critica -- fica preso aqui as vezes
+    pthread_mutex_lock(&mutex); // Inicio secao critica
 
     int flag = 0;
     while(flag == 0) {
         for (it1 = 0; it1 <= ListaTrabalhosProntos.size(); it1++) {
+
             if(ListaTrabalhosProntos[it1].trabalhoID == tId) {
                 if(!ListaTrabalhosProntos.empty()) {
-                    t = &ListaTrabalhosProntos[it1]; // Pega o trabalho it, selecionado pelo tId ARRUMAR
-                    *res = (int *)t->funcao(t->pEntrada); //deu seg fault com 2 threads
+                    t = &ListaTrabalhosProntos[it1]; // Pega o trabalho it, selecionado pelo tId
+                    *res = (int *)t->funcao(t->pEntrada);
                     ListaTrabalhosProntos.erase(ListaTrabalhosProntos.begin()+it1);
+
                     flag = 1;
+
                 }
             }
         }
 
         for (it2 =0; it2 < ListaTrabalhosTerminados.size(); it2++) {
             if (ListaTrabalhosTerminados[it2].trabalhoID == tId) {
-                t = &ListaTrabalhosTerminados[it2]; // Pega o trabalho it, selecionado pelo tId ARRUMAR
+                t = &ListaTrabalhosTerminados[it2]; // Pega o trabalho it, selecionado pelo tId
                 *res = (int *) t->resultado;
                 ListaTrabalhosTerminados.erase(ListaTrabalhosTerminados.begin()+it2);
                 flag = 1;
             }
         }
+
         if(ListaTrabalhosProntos.empty() and ListaTrabalhosTerminados.empty()) flag = 1;
         if(flag == 0)std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-
     pthread_mutex_unlock(&mutex); // Fim secao critica
     return 1;
 }

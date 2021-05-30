@@ -1,6 +1,7 @@
 #include <iostream>
 #include <pthread.h>
 #include "library.h"
+#include <time.h>
 using namespace std;
 
 void printArray(int *array, int n)
@@ -8,18 +9,13 @@ void printArray(int *array, int n)
     for (int i = 0; i < n; ++i) {
         cout << array[i] << " ";
     }
+    cout << endl;
 }
 
-
 struct Params{
-    int *array;
     int low;
+    int* array;
     int high;
-    Params(int* array_, int low_, int high_){
-        array = array_;
-        low = low_;
-        high = high_;
-    }
 };
 
 
@@ -27,11 +23,12 @@ struct Params{
 void* quickSort(void* params)
 
 {
-    Params paramsLocal = (*((Params*)params));
-    int i = paramsLocal.low;
-    int j = paramsLocal.high;
-    int pivot = paramsLocal.array[(i + j) / 2];
-    int* array = paramsLocal.array;
+    //Params paramsLocal = (*((Params*)params));
+    Params* paramsLocal = (Params*)params;
+    int i = paramsLocal->low;
+    int j = paramsLocal->high;
+    int pivot = paramsLocal->array[(i + j) / 2];
+    int* array = paramsLocal->array;
     int temp;
 
     while (i <= j)
@@ -49,56 +46,66 @@ void* quickSort(void* params)
             j--;
         }
     }
-    Params *b, *c;
+    Params *b = new Params();
+    Params *c = new Params();
     int k = -1, l = -1;
 
-    if (j > paramsLocal.low){
-
-        b = new Params(array, paramsLocal.low, j);
-        k = spawn(NULL, quickSort, b);
+    if (j > paramsLocal->low){
+        b->array = array;
+        b->low = paramsLocal->low;
+        b->high = j;
+        k = spawn(NULL, quickSort, (void*)b);
     }
 
-    if (i < paramsLocal.high){
-        c = new Params(array, i, paramsLocal.high);
-        l = spawn(NULL, quickSort, c);
+    if (i < paramsLocal->high){
+        c->array = array;
+        c->low = i;
+        c->high = paramsLocal->high;
+        l = spawn(NULL, quickSort, (void*)c);
     }
     int *rFat;
     if(k != -1) sync(k, (void**)&rFat);
     if(l != -1) sync(l, (void**)&rFat);
 
-    free(c);
-    free(b);
 
-    return (void*)2;
+    return (void*)&paramsLocal->high;
 }
 
 int main()
 {
+    int *array, tId, k=4, tam=10;
 
-    int array[] = {95, 45, 48, 98, 1, 485, 65, 478, 10, 2325};
-    int n = sizeof(array)/sizeof(array[0]);
+//    cout << "Qtde thread: ";
+//    cin >> tam;
+//    cout << "Informe o tamanho do array para Quick Sort: ";
+//    cin >> k;
 
-    int thread;
-    Params params(array,0,n);
+    array = (int*)malloc(tam*sizeof(int));
+
+    srand(time(NULL));
+    for(int i=0;i<tam;i++){
+        array[i] = rand() % 100;
+    }
+
+    Params *params = new Params();
+    params->array = array;
+    params->low = 0;
+    params->high = tam;
 
     cout << "Before Quick Sort :" << endl;
-    printArray(array, n);
+    printArray(array, tam);
 
-    cout << "Qtde thread: " << endl;
-    int u = 4;
-    //cin >> m;
-    start(u);
+    start(k);
 
-    thread = spawn(NULL, quickSort, &params);
-    // quickSort(array, 0, n);
-    int *rFat;
-    sync(thread, (void**)&rFat);
+    tId = spawn(NULL, quickSort, (void*)params);
+    int* ret;
+    sync(tId, (void**)&ret);
 
     cout << "After Quick Sort :" << endl;
-
-    printArray(array, n);
+    printArray(array, tam);
 
     finish();
+    free(array);
 
-    return (0);
+    return 0;
 }

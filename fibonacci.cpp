@@ -1,11 +1,7 @@
-//
-// Created by guilherme on 29/05/2021.
-//
 #include "library.h"
 #include <malloc.h>
-#include <pthread.h>
 #include <iostream>
-#include <list>
+
 using namespace std;
 extern int m;
 
@@ -47,19 +43,18 @@ int main() {
     //struct Atrib a;
     cout << "Qtde thread: ";
     cin >> m;
-    cout << "Digite o enesimo termo Fibonacci: ";
+    cout << "Digite o numero para Fibonacci: ";
     cin >> n;
 
-    start(m); // lança 4 PV como pthreads
+    start(m);
 
-    //a.p = 0;
-    //a.c = n;
     tId = spawn(NULL, fibo, (void*) &n);
     sync(tId,(void**)&r);
 
     cout << "Fibonacci(" << n << "): " << *r << endl;
 
     finish();
+    free(r);
 
     return 0;
 }
