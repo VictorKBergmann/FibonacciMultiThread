@@ -29,3 +29,5 @@
 
 compileMerge:
 		gcc mergesort.c -o mergesort -lpthread
+		g++ fibonnaci.cpp library.cpp -o fibonnaci -lpthread
+
