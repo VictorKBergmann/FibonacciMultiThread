@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <time.h>
 
 typedef struct {
     int low, mid, high, size;
@@ -18,8 +19,12 @@ int numThreads;
 int main(int argc, char** argv)
 {
     Array myArr;
-    numThreads = atoi(argv[1]);
-    int arrSize = atoi(argv[2]);
+    int arrSize ;
+
+    printf("Inform array size: ");
+    scanf("%d",&arrSize);
+    printf("Inform amount of threads to be used: ");
+    scanf("%d",&numThreads);
 
     myArr.size = arrSize;
     myArr.arr = (int*)malloc(arrSize*sizeof(int));
