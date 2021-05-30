@@ -10,6 +10,7 @@ using namespace std;
 
 void* fibo( void* dta ) {
     int*  n = (int*) dta; //original era *dta
+    cout << "dta do fibo: " << dta << "n do fibo: " << n << endl;
     int *n1, *n2,
             *r = (int *) malloc(sizeof(int)),
             *r1, *r2,
@@ -22,15 +23,17 @@ void* fibo( void* dta ) {
         *n1 = *n - 1;
         //a1.p = 0;
         //a1.c = n1;
+        cout << "chegou no spawn"<< endl;
         t1 = spawn( NULL, fibo, (void*) n1 );
+
         n2 = (int *) malloc(sizeof(int));
         *n2 = *n - 2;
         //a2.p = 0;
         //a1.c = n2;
         t2 = spawn( NULL, fibo, (void*) n2 );
-
-        sync( t1, (void*) &r1 );
-        sync( t2, (void*) &r2 );
+        cout << "passou do spawn"<< endl;
+        sync( t1, (void**) &r1 );
+        sync( t2, (void**) &r2 );
         *r = *r1 + *r2;
         free(r1);
         free(r2);
@@ -51,7 +54,7 @@ int main() {
     //a.p = 0;
     //a.c = n;
     tId = spawn(NULL, fibo, (void*) &n);
-    sync(tId,&r);
+    sync(tId,(void**)&r);
 
     cout << "Fibonacci(" << n << "): " << *r << endl;
 

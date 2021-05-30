@@ -4,7 +4,7 @@
 int start(int m);
 int finish(int m);
 int spawn(struct Atrib* atrib, void *(*t) (void *), void* dta);
-int sync(int tId, void* res);
+int sync(int tId, void** res);
 
 struct Atrib {
     int p;
