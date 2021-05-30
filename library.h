@@ -2,7 +2,7 @@
 #define TRABALHOPTHREADS_LIBRARY_H
 
 int start(int m);
-int finish(int m);
+int finish();
 int spawn(struct Atrib* atrib, void *(*t) (void *), void* dta);
 int sync(int tId, void** res);
 

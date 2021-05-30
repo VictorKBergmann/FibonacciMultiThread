@@ -7,10 +7,10 @@
 #include <iostream>
 #include <list>
 using namespace std;
+extern int m;
 
 void* fibo( void* dta ) {
     int*  n = (int*) dta; //original era *dta
-    cout << "dta do fibo: " << dta << "n do fibo: " << n << endl;
     int *n1, *n2,
             *r = (int *) malloc(sizeof(int)),
             *r1, *r2,
@@ -23,7 +23,6 @@ void* fibo( void* dta ) {
         *n1 = *n - 1;
         //a1.p = 0;
         //a1.c = n1;
-        cout << "chegou no spawn"<< endl;
         t1 = spawn( NULL, fibo, (void*) n1 );
 
         n2 = (int *) malloc(sizeof(int));
@@ -31,7 +30,6 @@ void* fibo( void* dta ) {
         //a2.p = 0;
         //a1.c = n2;
         t2 = spawn( NULL, fibo, (void*) n2 );
-        cout << "passou do spawn"<< endl;
         sync( t1, (void**) &r1 );
         sync( t2, (void**) &r2 );
         *r = *r1 + *r2;
@@ -44,13 +42,16 @@ void* fibo( void* dta ) {
 }
 
 int main() {
-    int n, *r, tId, m;
+    int n, *r, tId;
+
     //struct Atrib a;
     cout << "Qtde thread: ";
     cin >> m;
+    cout << "Digite o enesimo termo Fibonacci: ";
+    cin >> n;
+
     start(m); // lança 4 PV como pthreads
 
-    n = 10;
     //a.p = 0;
     //a.c = n;
     tId = spawn(NULL, fibo, (void*) &n);
@@ -58,7 +59,7 @@ int main() {
 
     cout << "Fibonacci(" << n << "): " << *r << endl;
 
-    finish(m);
+    finish();
 
     return 0;
 }

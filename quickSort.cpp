@@ -1,6 +1,6 @@
 ﻿#include <iostream>
 #include <pthread.h>
-
+#include "library.h"
 
 void printArray(int *array, int n)
 {
@@ -25,10 +25,11 @@ struct Params{
 void* quickSort(void* params)
 
 {
-    int i = (*((Params*)params)).low;
-    int j = (*((Params*)params)).high;
-    int pivot = (*((Params*)params)).array[(i + j) / 2];
-    int* array = (*((Params*)params)).array;
+    Params paramsLocal = (*((Params*)params))
+    int i = paramsLocal.low;
+    int j = paramsLocal.high;
+    int pivot = paramsLocal.array[(i + j) / 2];
+    int* array = paramsLocal.array;
     int temp;
 
     while (i <= j)
@@ -48,13 +49,13 @@ void* quickSort(void* params)
     }
     Params *b, *c;
     int k = -1, l = -1;
-    if (j > (*((Params*)params)).low){
-        b = new Params(array, (*((Params*)params)).low, j);
+    if (j > paramsLocal.low){
+        b = new Params(array, paramsLocal.low, j);
         k = spawn(NULL, quickSort, b);
     }
         
-    if (i < (*((Params*)params)).high){
-        c = new Params(array, (*((Params*)params)).low, j);
+    if (i < paramsLocal.high){
+        c = new Params(array, paramsLocal.low, j);
         l = spawn(NULL, quickSort, c);
     }
     if(k != -1){sync(k, NULL);}
@@ -77,6 +78,11 @@ int main()
     std::cout << "Before Quick Sort :" << std::endl;
     printArray(array, n);
 
+    cout << "Qtde thread: ";
+    int m;
+    cin >> m;
+    start(m);
+
     thread = spawn(NULL, quickSort, &params)
     // quickSort(array, 0, n);
 
@@ -84,6 +90,8 @@ int main()
 
     std::cout << "After Quick Sort :" << std::endl;
     printArray(array, n);
+
+    finish();
 
     return (0);
 }
