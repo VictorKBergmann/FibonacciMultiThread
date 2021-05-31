@@ -54,6 +54,7 @@ int main() {
     cout << "Fibonacci(" << n << "): " << *r << endl;
 
     finish();
+
     free(r);
 
     return 0;

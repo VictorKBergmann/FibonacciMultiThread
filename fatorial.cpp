@@ -35,7 +35,7 @@ int main() {
     cout << "Digite o numero para Fatorial: ";
     cin >> n;
 
-    start(m); // lança 4 PV como pthreads
+    start(m);
 
     tId = spawn(NULL, fat, (void*) &n);
     sync(tId,(void**)&rFat);

@@ -14,8 +14,8 @@ fibonacci : library.o fibonacci.o
 quickSort : library.o quickSort.o
 	${CC} ${CFLAGS} library.o quickSort.o ${LDFLAGS} -o quickSort -lpthread
 
-#clean:
-#	rm -rf *.o
-#	- rm quickSort
-#	- rm fibonacci
-#	- rm fatorial
+clean:
+	rm -rf *.o
+	- rm quickSort
+	- rm fibonacci
+	- rm fatorial

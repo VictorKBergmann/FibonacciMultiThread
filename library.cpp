@@ -37,7 +37,7 @@ struct Trabalho* pegaUmTrabalho() {
         pthread_cond_wait(&cond,&mutex);
     }
     else{
-        t = &ListaTrabalhosProntos[ListaTrabalhosProntos.size()-1]; // Pega o primeiro da "fila" por padrão ARRUMAR
+        t = &ListaTrabalhosProntos[ListaTrabalhosProntos.size()-1]; // Pega o primeiro da "fila" por padrão
         ListaTrabalhosProntos.erase(ListaTrabalhosProntos.end()-1);
     }
 
@@ -78,17 +78,19 @@ int start(int m){
     pthread_mutexattr_init(&attr);
     pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init(&mutex, &attr);
-    for( int i = 0 ; i < m; i++ ) {
+    for( int i = 0 ; i < m; i++ )
         ret |= pthread_create(&(pvs[i]), NULL, MeuPV, NULL);
-    }
+
     return ret;
 }
 
 int finish() {
-    int ret = 0;
+    int ret;
     fim = true;
     for( int i = 0 ; i < m; i++ )
-        ret = pthread_join(pvs[i], NULL);
+        //ret = pthread_join(pvs[i], NULL); //join funcionava corretamente em uma maquina
+        ret = pthread_cancel(pvs[i]);
+    pthread_mutex_destroy(&mutex);
     return ret;
 }
 
@@ -109,26 +111,24 @@ int spawn(struct Atrib *atrib, void *(*t)(void *), void *dta) {
 
 int sync(int tId, void** res){
     int it1, it2;
-    struct Trabalho* t = new struct Trabalho();
-    pthread_mutex_lock(&mutex); // Inicio secao critica
+    struct Trabalho* t;
+
+    pthread_mutex_lock(&mutex);
 
     int flag = 0;
     while(flag == 0) {
-        for (it1 = 0; it1 <= ListaTrabalhosProntos.size(); it1++) {
-
+        for (it1 = 0; it1 <= (int)ListaTrabalhosProntos.size(); it1++) {
             if(ListaTrabalhosProntos[it1].trabalhoID == tId) {
                 if(!ListaTrabalhosProntos.empty()) {
                     t = &ListaTrabalhosProntos[it1]; // Pega o trabalho it, selecionado pelo tId
                     *res = (int *)t->funcao(t->pEntrada);
                     ListaTrabalhosProntos.erase(ListaTrabalhosProntos.begin()+it1);
-
                     flag = 1;
-
                 }
             }
         }
 
-        for (it2 =0; it2 < ListaTrabalhosTerminados.size(); it2++) {
+        for (it2 =0; it2 < (int)ListaTrabalhosTerminados.size(); it2++) {
             if (ListaTrabalhosTerminados[it2].trabalhoID == tId) {
                 t = &ListaTrabalhosTerminados[it2]; // Pega o trabalho it, selecionado pelo tId
                 *res = (int *) t->resultado;
@@ -138,7 +138,7 @@ int sync(int tId, void** res){
         }
 
         if(ListaTrabalhosProntos.empty() and ListaTrabalhosTerminados.empty()) flag = 1;
-        if(flag == 0)std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        //if(flag == 0)std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     pthread_mutex_unlock(&mutex); // Fim secao critica
     return 1;
