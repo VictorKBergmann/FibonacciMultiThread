@@ -13,7 +13,7 @@ Trabalho da disciplina de  Sistemas Operacionais
  - Quick Sort
 
 ## Passos para execução
-   make
+ - make
  - ./fibonacci  	-- para a execução do exemplo 1 
  - ./fatorial 	-- para a execução do exemplo 2 
  - ./quickSort 	-- para a execução do exemplo 3 
