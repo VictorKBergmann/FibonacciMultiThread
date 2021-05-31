@@ -2,9 +2,9 @@
 Trabalho da disciplina de  Sistemas Operacionais
 
 # Colaboradores
- Bernardo Ribeiro Beling (berbeling@inf.ufpel.edu.br) <br\>
- Guilherme Ramison (gramison@inf.ufpel.edu.br) <br\>
- Victor Kunde Bergmann (vkbergmann@inf.ufpel.edu.br) <br\>
+ -Bernardo Ribeiro Beling (berbeling@inf.ufpel.edu.br) <br\>
+ -Guilherme Ramison (gramison@inf.ufpel.edu.br) <br\>
+ -Victor Kunde Bergmann (vkbergmann@inf.ufpel.edu.br) <br\>
 
 ## Programas Exemplos
 
@@ -14,7 +14,7 @@ Trabalho da disciplina de  Sistemas Operacionais
 
 ## Passos para execução
    make
- # ./fibonacci  	-- para a execução do exemplo 1 
- # ./fatorial 	-- para a execução do exemplo 2 
- # ./quickSort 	-- para a execução do exemplo 3 
- # make clean 	-- antes de compilar uma segunda vez
+ - ./fibonacci  	-- para a execução do exemplo 1 
+ - ./fatorial 	-- para a execução do exemplo 2 
+ - ./quickSort 	-- para a execução do exemplo 3 
+ - make clean 	-- antes de compilar uma segunda vez
