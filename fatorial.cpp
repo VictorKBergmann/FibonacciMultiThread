@@ -6,13 +6,13 @@ using namespace std;
 extern int m;
 
 void* fat( void* dta ) {
-    int *n = (int *) dta;
-    int *rFat = (int *) malloc(sizeof(int)),
+    long int *n = (long int *) dta;
+    long int *rFat = (long int *) malloc(sizeof(long int)),
         *n1, *r1, t1;
 
     if(*n <= 1) *rFat = 1;
     else {
-        n1 = (int *) malloc(sizeof(int));
+        n1 = (long int *) malloc(sizeof(long int));
         *n1 = *n - 1;
         t1 = spawn( NULL, fat, (void*) n1 );
 
@@ -27,8 +27,8 @@ void* fat( void* dta ) {
 }
 
 int main() {
-    int n, *rFat, tId;
-
+    int n, tId;
+    long int *rFat;
     //struct Atrib a;
     cout << "Qtde thread: ";
     cin >> m;
