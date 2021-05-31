@@ -14,7 +14,7 @@ Trabalho da disciplina de  Sistemas Operacionais
 
 ## Passos para execução
    make
-  ./fibonacci  	-- para a execução do exemplo 1 <br\>
-  ./fatorial 	-- para a execução do exemplo 2  <br\>
-  ./quickSort 	-- para a execução do exemplo 3 <br\>
-  make clean 	-- antes de compilar uma segunda vez <br\>
+ # ./fibonacci  	-- para a execução do exemplo 1 
+ # ./fatorial 	-- para a execução do exemplo 2 
+ # ./quickSort 	-- para a execução do exemplo 3 
+ # make clean 	-- antes de compilar uma segunda vez
